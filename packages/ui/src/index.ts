@@ -8,6 +8,7 @@ export { Header } from './components/Header';
 export { LinkButton } from './components/LinkButton';
 export { PageHeader } from './components/PageHeader';
 export { Skeleton } from './components/Skeleton';
+export * from './hooks/use-debounced-value';
 
 export type { BadgeProps, BadgeVariant } from './components/Badge';
 export type { ButtonProps, ButtonSize, ButtonVariant } from './components/Button';
