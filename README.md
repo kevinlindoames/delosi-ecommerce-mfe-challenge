@@ -67,7 +67,11 @@ La solución incluye:
 * Product Detail Page con metadata dinámica y JSON-LD.
 * Carrito persistente con Zustand.
 * Checkout simulado.
+* Búsqueda con debounce.
+* Optimización avanzada de imágenes con `next/image`.
 * Tests unitarios y de componentes.
+* Test E2E del flujo principal de compra con Playwright.
+* CI con GitHub Actions.
 * Build productivo validado para todas las zonas.
 
 ---
@@ -85,6 +89,8 @@ La solución incluye:
 * React Testing Library
 * Testing Library User Event
 * jsdom
+* Playwright
+* GitHub Actions
 * FakeStore API compatible desplegada en Render
 
 ---
@@ -107,8 +113,15 @@ delosi-ecommerce-mfe-challenge/
     analytics/
     config/
 
+  tests/
+    e2e/
+
+  .github/
+    workflows/
+
   package.json
   tsconfig.base.json
+  playwright.config.ts
   README.md
 ```
 
@@ -174,12 +187,12 @@ Ventajas:
 
 El despliegue productivo usa servicios independientes para cada zona:
 
-| Servicio | Plataforma | Responsabilidad |
-| -------- | ---------- | --------------- |
-| `delosi-shell` | Vercel | Punto de entrada principal y composición por rewrites. |
-| `delosi-catalog` | Vercel | Product Listing Page y Product Detail Page. |
-| `delosi-checkout` | Vercel | Carrito y checkout simulado. |
-| `fake-store-api-kevin` | Render | API compatible con FakeStore conectada a MongoDB Atlas. |
+| Servicio               | Plataforma | Responsabilidad                                         |
+| ---------------------- | ---------- | ------------------------------------------------------- |
+| `delosi-shell`         | Vercel     | Punto de entrada principal y composición por rewrites.  |
+| `delosi-catalog`       | Vercel     | Product Listing Page y Product Detail Page.             |
+| `delosi-checkout`      | Vercel     | Carrito y checkout simulado.                            |
+| `fake-store-api-kevin` | Render     | API compatible con FakeStore conectada a MongoDB Atlas. |
 
 ### Variables de entorno en producción
 
@@ -206,10 +219,10 @@ CHECKOUT_DOMAIN=https://delosi-checkout.vercel.app
 
 Para este monorepo con npm workspaces, la configuración más estable es desplegar cada zona desde la raíz del repositorio y apuntar el build/output a cada app:
 
-| Proyecto Vercel | Build Command | Output Directory |
-| --------------- | ------------- | ---------------- |
-| `delosi-shell` | `npm run build:shell` | `apps/shell/.next` |
-| `delosi-catalog` | `npm run build:catalog` | `apps/catalog/.next` |
+| Proyecto Vercel   | Build Command            | Output Directory      |
+| ----------------- | ------------------------ | --------------------- |
+| `delosi-shell`    | `npm run build:shell`    | `apps/shell/.next`    |
+| `delosi-catalog`  | `npm run build:catalog`  | `apps/catalog/.next`  |
 | `delosi-checkout` | `npm run build:checkout` | `apps/checkout/.next` |
 
 El orden recomendado de despliegue es:
@@ -246,7 +259,7 @@ aunque internamente las rutas estén resueltas por diferentes aplicaciones.
 * Product Detail Page.
 * Server-side data fetching.
 * Filtros.
-* Búsqueda.
+* Búsqueda con debounce.
 * Ordenamiento.
 * SEO dinámico.
 * JSON-LD.
@@ -297,7 +310,16 @@ También incluye utilidades compartidas:
 ```txt
 cn
 formatCurrency
+useDebouncedValue
 ```
+
+---
+
+### Identidad visual
+
+Se refinó la identidad visual del e-commerce usando una paleta **Teal/Jade premium** con CTA naranja.
+
+La personalización se centralizó en los tokens del paquete `@delosi/ui`, manteniendo consistencia visual entre `shell`, `catalog` y `checkout` sin modificar lógica de negocio.
 
 ---
 
@@ -305,7 +327,7 @@ formatCurrency
 
 Se decidió separar `Button` y `LinkButton` para mantener semántica clara:
 
-* `Button`: acciones como submit, click o clear cart.
+* `Button`: acciones como submit, click, add to cart o clear cart.
 * `LinkButton`: navegación entre rutas.
 
 Esto mejora accesibilidad, tipado y mantenibilidad.
@@ -353,12 +375,15 @@ Incluye:
 * Renderizado con Server Components.
 * Consumo real de FakeStore API.
 * Filtro por categoría.
-* Búsqueda por texto.
+* Búsqueda por texto con debounce.
+* Filtros controlados por URL mediante `searchParams`.
 * Ordenamiento por precio y título.
 * Product cards.
 * Add to cart.
 * Empty state.
 * Responsive layout.
+
+La búsqueda con debounce evita actualizar la URL en cada pulsación inmediata, reduciendo renders innecesarios y mejorando la experiencia del usuario en la PLP.
 
 ---
 
@@ -449,12 +474,29 @@ Se aplicaron varias decisiones orientadas a performance:
 
 * Uso de Server Components en PLP/PDP.
 * Uso de `next/image` para optimización de imágenes.
-* Lazy loading automático de imágenes.
-* `sizes` en imágenes de producto.
+* Lazy loading automático de imágenes no prioritarias.
+* `priority` y `fetchPriority` en imágenes críticas.
+* `sizes` optimizado en imágenes de producto.
+* Configuración de `deviceSizes` e `imageSizes`.
+* Formatos AVIF/WebP para imágenes optimizadas.
 * Revalidación de datos desde API.
 * Separación por zonas para aislar assets.
 * Design System compartido para evitar duplicación visual.
 * Estados loading/error/empty para mejorar UX percibida.
+* Búsqueda con debounce para evitar actualizaciones inmediatas de URL en cada pulsación.
+
+### Validación con PageSpeed Insights
+
+La demo desplegada fue validada con PageSpeed Insights obteniendo:
+
+```txt
+Performance: 100
+Accessibility: 100
+Best Practices: 100
+SEO: 100
+```
+
+También se optimizó la entrega de imágenes reduciendo significativamente las oportunidades reportadas por PageSpeed mediante ajustes de `sizes`, `imageSizes`, `deviceSizes`, formatos AVIF/WebP y prioridad de carga para las primeras cards visibles.
 
 ---
 
@@ -479,11 +521,13 @@ https://fakestoreapi.com/img/**
 
 Se mantuvo la optimización nativa de Next.js y no se usó `unoptimized`.
 
+Además, se ajustaron los tamaños generados por Next.js para que las imágenes de cards y detalle sean más cercanas al tamaño real en pantalla, reduciendo transferencia innecesaria sin sacrificar calidad visual.
+
 ---
 
 ## 11. Testing
 
-El proyecto tiene tests unitarios y tests de componentes.
+El proyecto tiene tests unitarios, tests de componentes y un test E2E del flujo principal de compra.
 
 ### Resumen actual
 
@@ -537,9 +581,46 @@ Cobertura:
   * muestra productos.
   * muestra total.
 
+### Tests E2E con Playwright
+
+Se agregó una prueba E2E con Playwright para validar el flujo crítico de compra:
+
+```txt
+/products
+→ product detail
+→ add to cart
+→ /cart
+→ /checkout
+```
+
+Este test valida la integración real entre la zona de catálogo y la zona de checkout, comprobando que el usuario pueda navegar al detalle de producto, agregar un item al carrito, revisar el resumen y continuar al checkout.
+
 ---
 
-## 12. Scripts disponibles
+## 12. CI con GitHub Actions
+
+El proyecto incluye un workflow de CI con GitHub Actions para validar automáticamente la calidad del proyecto en cada push o pull request hacia `main`.
+
+Validaciones incluidas:
+
+```txt
+npm ci
+npm run test
+npm run build
+npm run test:e2e
+```
+
+Esto asegura que los tests unitarios, tests de componentes, build productivo y flujo E2E principal se mantengan estables antes de integrar cambios.
+
+Archivo:
+
+```txt
+.github/workflows/ci.yml
+```
+
+---
+
+## 13. Scripts disponibles
 
 ### Instalar dependencias
 
@@ -561,10 +642,28 @@ npm --workspace @delosi/catalog run dev
 npm --workspace @delosi/checkout run dev
 ```
 
-### Ejecutar tests
+### Ejecutar tests unitarios y de componentes
 
 ```bash
 npm run test
+```
+
+### Ejecutar tests E2E
+
+```bash
+npm run test:e2e
+```
+
+### Ejecutar tests E2E con interfaz visual
+
+```bash
+npm run test:e2e:ui
+```
+
+### Ver reporte de Playwright
+
+```bash
+npm run test:e2e:report
 ```
 
 ### Ejecutar build completo
@@ -575,7 +674,7 @@ npm run build
 
 ---
 
-## 13. Validación de build
+## 14. Validación de build
 
 Build validado correctamente para:
 
@@ -602,7 +701,7 @@ checkout:
 
 ---
 
-## 14. Variables y configuración
+## 15. Variables y configuración
 
 El proyecto usa configuración centralizada en:
 
@@ -621,7 +720,7 @@ Esto evita hardcodear rutas o valores compartidos dentro de los componentes.
 
 ---
 
-## 15. Trade-offs
+## 16. Trade-offs
 
 ### Por qué no se usó Module Federation
 
@@ -669,27 +768,34 @@ Por eso el checkout genera una orden simulada localmente y limpia el carrito al 
 
 ---
 
-## 16. Mejoras futuras
+### Por qué CI sin deploy automático
+
+El proyecto tiene despliegue productivo por zonas en Vercel, pero el workflow de GitHub Actions se limita a validaciones de calidad.
+
+Se decidió no automatizar el deploy desde GitHub Actions porque cada zona tiene su propio proyecto en Vercel (`shell`, `catalog`, `checkout`) y Vercel ya gestiona despliegues por integración con GitHub.
+
+Esto mantiene el CI simple, estable y enfocado en validar build, tests y E2E.
+
+---
+
+## 17. Mejoras futuras
 
 Posibles mejoras si el proyecto evolucionara:
 
 * Agregar autenticación.
 * Agregar favoritos.
-* Agregar búsqueda con debounce.
 * Agregar paginación real.
 * Agregar filtros por precio/rating.
-* Agregar E2E tests con Playwright.
-* Agregar CI/CD.
 * Agregar Storybook para el Design System.
 * Agregar analytics reales.
 * Agregar cache distribuido o edge caching.
-* Agregar deploy independiente por zona.
 * Agregar manejo de stock.
 * Agregar integración con pasarela de pago.
+* Agregar hardening de seguridad con CSP, COOP y headers adicionales.
 
 ---
 
-## 17. Cómo defender la arquitectura
+## 18. Cómo defender la arquitectura
 
 La solución fue diseñada como un monorepo con microfrontends usando Next.js Multi-Zones.
 
@@ -701,7 +807,7 @@ Esta arquitectura mantiene una separación clara, permite escalar por dominio y 
 
 ---
 
-## 18. Estado final
+## 19. Estado final
 
 El proyecto cumple con:
 
@@ -715,8 +821,13 @@ El proyecto cumple con:
 * Carrito persistente.
 * Checkout simulado.
 * Diseño retail responsive.
+* Identidad visual centralizada con design tokens.
+* Búsqueda con debounce.
+* Optimización avanzada de imágenes con `next/image`.
 * Tests unitarios.
 * Tests de componentes.
+* Test E2E con Playwright.
+* CI con GitHub Actions.
 * Build productivo limpio.
 * Deploy productivo por zonas en Vercel.
 * API compatible con FakeStore desplegada en Render.
