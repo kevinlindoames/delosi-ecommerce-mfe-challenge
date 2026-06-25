@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@source "../../../../packages/ui/src";
+
+@import "@delosi/ui/tokens.css";
+@import "@delosi/ui/base.css";
