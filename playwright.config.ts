@@ -2,6 +2,8 @@
 
 import { defineConfig, devices } from '@playwright/test';
 
+const isCI = Boolean(process.env.CI);
+
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 30_000,
@@ -9,7 +11,7 @@ export default defineConfig({
     timeout: 10_000,
   },
   fullyParallel: true,
-  retries: process.env.CI ? 2 : 0,
+  retries: isCI ? 2 : 0,
   reporter: [['list'], ['html']],
   use: {
     baseURL: 'http://localhost:3000',
@@ -17,12 +19,14 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: isCI
+    ? undefined
+    : {
+        command: 'npm run dev',
+        url: 'http://localhost:3000',
+        reuseExistingServer: true,
+        timeout: 120_000,
+      },
   projects: [
     {
       name: 'chromium',

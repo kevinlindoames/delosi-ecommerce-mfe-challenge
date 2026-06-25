@@ -13,6 +13,11 @@ jobs:
     name: Build, unit tests and E2E
     runs-on: ubuntu-latest
 
+    env:
+      FAKESTORE_API_URL: https://fake-store-api-kevin.onrender.com
+      CATALOG_DOMAIN: http://localhost:3001
+      CHECKOUT_DOMAIN: http://localhost:3002
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,4 +41,7 @@ jobs:
         run: npm run build
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: |
+          npm run dev &
+          npx wait-on http://localhost:3000 http://localhost:3000/products http://localhost:3000/cart --timeout 180000
+          npm run test:e2e
