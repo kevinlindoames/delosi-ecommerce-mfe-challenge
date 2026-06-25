@@ -1,18 +1,22 @@
-import { routes } from '@delosi/config';
-import { Badge, Card, LinkButton, formatCurrency } from '@delosi/ui';
-import Image from 'next/image';
-import { AddToCartButton } from '../AddToCartButton';
-import type { ProductCardProps } from './ProductCard.types';
+import { routes } from "@delosi/config";
+import { Badge, Card, LinkButton, formatCurrency } from "@delosi/ui";
+import Image from "next/image";
+import { AddToCartButton } from "../AddToCartButton";
+import type { ProductCardProps } from "./ProductCard.types";
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, priority = false }: ProductCardProps) {
   return (
-    <Card variant="interactive" className="group flex h-full flex-col overflow-hidden p-0">
+    <Card
+      variant="interactive"
+      className="group flex h-full flex-col overflow-hidden p-0"
+    >
       <div className="relative flex h-64 items-center justify-center bg-gradient-to-br from-white via-[var(--color-retail-warm)] to-[var(--color-primary-soft)] p-8">
         <Image
           src={product.image}
           alt={product.title}
           fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+          priority={priority}
+          sizes="(min-width: 1280px) 286px, (min-width: 1024px) 25vw, (min-width: 768px) 45vw, 90vw"
           className="object-contain p-8 transition duration-300 group-hover:scale-105"
         />
 
@@ -47,7 +51,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="flex gap-2">
             <AddToCartButton product={product} size="sm" />
 
-            <LinkButton href={routes.productDetail(product.id)} size="sm" variant="outline">
+            <LinkButton
+              href={routes.productDetail(product.id)}
+              size="sm"
+              variant="outline"
+            >
               View
             </LinkButton>
           </div>

@@ -1,16 +1,16 @@
-import { routes } from '@delosi/config';
+import { routes } from "@delosi/config";
 import {
   filterProducts,
   getProductCategoriesWithFallback,
   getProducts,
   sortProducts,
   type ProductSortOption,
-} from '@delosi/products';
-import { Container, EmptyState, LinkButton, PageHeader } from '@delosi/ui';
-import { CatalogHeader } from '../../features/cart/components/CatalogHeader';
-import { ProductCard } from '../../features/products/components/ProductCard';
-import { ProductFilters } from '../../features/products/components/ProductFilters/ProductFilters';
-import { validProductSortOptions } from '../../features/products/constants/product-filter-options';
+} from "@delosi/products";
+import { Container, EmptyState, LinkButton, PageHeader } from "@delosi/ui";
+import { CatalogHeader } from "../../features/cart/components/CatalogHeader";
+import { ProductCard } from "../../features/products/components/ProductCard";
+import { ProductFilters } from "../../features/products/components/ProductFilters/ProductFilters";
+import { validProductSortOptions } from "../../features/products/constants/product-filter-options";
 
 type ProductsPageProps = {
   searchParams: Promise<{
@@ -24,7 +24,9 @@ function isValidSortOption(sort?: string): sort is ProductSortOption {
   return validProductSortOptions.includes(sort as ProductSortOption);
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
   const params = await searchParams;
 
   const search = params.search?.trim() || undefined;
@@ -45,7 +47,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <>
-     <CatalogHeader />
+      <CatalogHeader />
 
       <Container>
         <PageHeader
@@ -68,18 +70,22 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
         <div className="mt-6 flex items-center justify-between gap-4 text-sm text-[var(--color-muted)]">
           <p>
-            Showing{' '}
+            Showing{" "}
             <span className="font-bold text-[var(--color-heading)]">
               {visibleProducts.length}
-            </span>{' '}
+            </span>{" "}
             of {products.length} products
           </p>
         </div>
 
         {visibleProducts.length > 0 ? (
           <section className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {visibleProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {visibleProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                priority={index < 3}
+              />
             ))}
           </section>
         ) : (
