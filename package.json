@@ -1,0 +1,35 @@
+{
+  "name": "delosi-ecommerce-mfe-challenge",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:shell": "npm --workspace @delosi/shell run dev -- -p 3000",
+    "dev:catalog": "npm --workspace @delosi/catalog run dev -- -p 3001",
+    "dev:checkout": "npm --workspace @delosi/checkout run dev -- -p 3002",
+    "dev": "concurrently \"npm run dev:shell\" \"npm run dev:catalog\" \"npm run dev:checkout\"",
+    "build:shell": "npm --workspace @delosi/shell run build",
+    "build:catalog": "npm --workspace @delosi/catalog run build",
+    "build:checkout": "npm --workspace @delosi/checkout run build",
+    "build": "npm run build:shell && npm run build:catalog && npm run build:checkout",
+    "lint": "npm --workspaces --if-present run lint",
+    "test": "npm --workspaces --if-present run test:run",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "concurrently": "^9.2.3",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.6.2",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "zustand": "^5.0.14"
+  }
+}
