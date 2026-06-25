@@ -16,6 +16,44 @@ Home
 
 ---
 
+## Demo y servicios desplegados
+
+### Aplicación principal
+
+```txt
+Shell:
+https://delosi-shell.vercel.app
+```
+
+### Zonas desplegadas
+
+```txt
+Catalog:
+https://delosi-catalog.vercel.app
+
+Checkout:
+https://delosi-checkout.vercel.app
+```
+
+### API compatible con FakeStore
+
+```txt
+API:
+https://fake-store-api-kevin.onrender.com
+```
+
+Endpoints principales:
+
+```txt
+GET /products
+GET /products/:id
+GET /products/categories
+```
+
+La aplicación consume productos mediante la variable `FAKESTORE_API_URL`. En producción se usa una API compatible con FakeStore desplegada en Render para mantener el consumo vía API, Server Components y SSR sin hardcodear datos en el frontend.
+
+---
+
 ## 1. Descripción del proyecto
 
 Este proyecto simula una experiencia moderna de e-commerce retail construida sobre una arquitectura modular y escalable.
@@ -47,7 +85,7 @@ La solución incluye:
 * React Testing Library
 * Testing Library User Event
 * jsdom
-* FakeStore API
+* FakeStore API compatible desplegada en Render
 
 ---
 
@@ -132,7 +170,59 @@ Ventajas:
 
 ---
 
-## 5. Decisiones de arquitectura
+## 5. Arquitectura de despliegue
+
+El despliegue productivo usa servicios independientes para cada zona:
+
+| Servicio | Plataforma | Responsabilidad |
+| -------- | ---------- | --------------- |
+| `delosi-shell` | Vercel | Punto de entrada principal y composición por rewrites. |
+| `delosi-catalog` | Vercel | Product Listing Page y Product Detail Page. |
+| `delosi-checkout` | Vercel | Carrito y checkout simulado. |
+| `fake-store-api-kevin` | Render | API compatible con FakeStore conectada a MongoDB Atlas. |
+
+### Variables de entorno en producción
+
+#### `delosi-catalog`
+
+```env
+FAKESTORE_API_URL=https://fake-store-api-kevin.onrender.com
+```
+
+#### `delosi-checkout`
+
+```env
+FAKESTORE_API_URL=https://fake-store-api-kevin.onrender.com
+```
+
+#### `delosi-shell`
+
+```env
+CATALOG_DOMAIN=https://delosi-catalog.vercel.app
+CHECKOUT_DOMAIN=https://delosi-checkout.vercel.app
+```
+
+### Configuración recomendada en Vercel
+
+Para este monorepo con npm workspaces, la configuración más estable es desplegar cada zona desde la raíz del repositorio y apuntar el build/output a cada app:
+
+| Proyecto Vercel | Build Command | Output Directory |
+| --------------- | ------------- | ---------------- |
+| `delosi-shell` | `npm run build:shell` | `apps/shell/.next` |
+| `delosi-catalog` | `npm run build:catalog` | `apps/catalog/.next` |
+| `delosi-checkout` | `npm run build:checkout` | `apps/checkout/.next` |
+
+El orden recomendado de despliegue es:
+
+```txt
+1. delosi-catalog
+2. delosi-checkout
+3. delosi-shell
+```
+
+---
+
+## 6. Decisiones de arquitectura
 
 ### Shell como punto de entrada
 
@@ -239,7 +329,7 @@ La persistencia se configuró de forma segura para funcionar correctamente en br
 
 ---
 
-## 6. Funcionalidades implementadas
+## 7. Funcionalidades implementadas
 
 ### Home
 
@@ -337,7 +427,7 @@ Incluye:
 
 ---
 
-## 7. SEO y metadata
+## 8. SEO y metadata
 
 El proyecto implementa SEO especialmente en la zona de catálogo.
 
@@ -353,7 +443,7 @@ Esto permite que cada producto tenga información semántica propia.
 
 ---
 
-## 8. Performance
+## 9. Performance
 
 Se aplicaron varias decisiones orientadas a performance:
 
@@ -368,7 +458,7 @@ Se aplicaron varias decisiones orientadas a performance:
 
 ---
 
-## 9. Optimización de imágenes en Multi-Zones
+## 10. Optimización de imágenes en Multi-Zones
 
 En una arquitectura Multi-Zones, cada zona debe ser responsable de sus assets y de su pipeline de optimización.
 
@@ -391,7 +481,7 @@ Se mantuvo la optimización nativa de Next.js y no se usó `unoptimized`.
 
 ---
 
-## 10. Testing
+## 11. Testing
 
 El proyecto tiene tests unitarios y tests de componentes.
 
@@ -449,7 +539,7 @@ Cobertura:
 
 ---
 
-## 11. Scripts disponibles
+## 12. Scripts disponibles
 
 ### Instalar dependencias
 
@@ -485,7 +575,7 @@ npm run build
 
 ---
 
-## 12. Validación de build
+## 13. Validación de build
 
 Build validado correctamente para:
 
@@ -512,7 +602,7 @@ checkout:
 
 ---
 
-## 13. Variables y configuración
+## 14. Variables y configuración
 
 El proyecto usa configuración centralizada en:
 
@@ -531,7 +621,7 @@ Esto evita hardcodear rutas o valores compartidos dentro de los componentes.
 
 ---
 
-## 14. Trade-offs
+## 15. Trade-offs
 
 ### Por qué no se usó Module Federation
 
@@ -553,11 +643,21 @@ Nx o Turborepo podrían aportar cacheo avanzado, affected builds y task orchestr
 
 ---
 
-### Por qué se usa FakeStore API
+### Por qué se usa una API compatible con FakeStore
 
-FakeStore API permite simular un catálogo real con datos externos y productos con imágenes.
+La solución consume productos usando una variable de entorno (`FAKESTORE_API_URL`) y no datos hardcodeados en el frontend.
 
-Para robustez, los datos se validan con Zod antes de ser usados por la aplicación.
+Durante el despliegue en entornos cloud, la API pública de FakeStore podía responder `403` desde IPs compartidas de hosting. Para mantener Server Components, SSR, validación con Zod y consumo real vía API, se desplegó una instancia compatible con FakeStore en Render, conectada a MongoDB Atlas.
+
+Esto mantiene el contrato de la API:
+
+```txt
+/products
+/products/:id
+/products/categories
+```
+
+y permite que el frontend siga siendo independiente del origen real de datos.
 
 ---
 
@@ -569,7 +669,7 @@ Por eso el checkout genera una orden simulada localmente y limpia el carrito al 
 
 ---
 
-## 15. Mejoras futuras
+## 16. Mejoras futuras
 
 Posibles mejoras si el proyecto evolucionara:
 
@@ -589,7 +689,7 @@ Posibles mejoras si el proyecto evolucionara:
 
 ---
 
-## 16. Cómo defender la arquitectura
+## 17. Cómo defender la arquitectura
 
 La solución fue diseñada como un monorepo con microfrontends usando Next.js Multi-Zones.
 
@@ -601,7 +701,7 @@ Esta arquitectura mantiene una separación clara, permite escalar por dominio y 
 
 ---
 
-## 17. Estado final
+## 18. Estado final
 
 El proyecto cumple con:
 
@@ -618,3 +718,5 @@ El proyecto cumple con:
 * Tests unitarios.
 * Tests de componentes.
 * Build productivo limpio.
+* Deploy productivo por zonas en Vercel.
+* API compatible con FakeStore desplegada en Render.
