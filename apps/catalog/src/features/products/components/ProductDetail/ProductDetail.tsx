@@ -15,8 +15,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
             alt={product.title}
             fill
             priority
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-contain"
+            fetchPriority="high"
+            sizes="(min-width: 1024px) 520px, 90vw"
+            className="object-contain p-8"
           />
         </div>
       </Card>

@@ -12,13 +12,14 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     >
       <div className="relative flex h-64 items-center justify-center bg-gradient-to-br from-white via-[var(--color-retail-warm)] to-[var(--color-primary-soft)] p-8">
         <Image
-          src={product.image}
-          alt={product.title}
-          fill
-          priority={priority}
-          sizes="(min-width: 1280px) 286px, (min-width: 1024px) 25vw, (min-width: 768px) 45vw, 90vw"
-          className="object-contain p-8 transition duration-300 group-hover:scale-105"
-        />
+  src={product.image}
+  alt={product.title}
+  fill
+  priority={priority}
+  fetchPriority={priority ? 'high' : 'auto'}
+  sizes="(min-width: 1280px) 220px, (min-width: 1024px) 22vw, (min-width: 768px) 45vw, 90vw"
+  className="object-contain p-8 transition duration-300 group-hover:scale-105"
+/>
 
         {product.rating ? (
           <span className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-black text-[var(--color-accent-foreground)] shadow-sm">
