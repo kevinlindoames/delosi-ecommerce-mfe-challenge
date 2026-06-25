@@ -1,24 +1,24 @@
 :root {
-  --color-background: #fff7ed;
-  --color-background-soft: #ffedd5;
+  --color-background: #f8faf7;
+  --color-background-soft: #ecfdf5;
   --color-surface: #ffffff;
-  --color-surface-muted: #f8fafc;
+  --color-surface-muted: #f0fdfa;
 
-  --color-heading: #111827;
-  --color-foreground: #1f2937;
-  --color-muted: #6b7280;
-  --color-muted-foreground: #4b5563;
+  --color-heading: #172026;
+  --color-foreground: #1f2a2e;
+  --color-muted: #64748b;
+  --color-muted-foreground: #475569;
 
-  --color-border: #e5e7eb;
-  --color-border-strong: #d1d5db;
+  --color-border: #d9e7e2;
+  --color-border-strong: #b7d3ca;
 
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-soft: #dbeafe;
+  --color-primary: #0f766e;
+  --color-primary-hover: #115e59;
+  --color-primary-soft: #ccfbf1;
   --color-primary-foreground: #ffffff;
 
-  --color-secondary: #111827;
-  --color-secondary-hover: #1f2937;
+  --color-secondary: #172026;
+  --color-secondary-hover: #243238;
   --color-secondary-foreground: #ffffff;
 
   --color-accent: #f97316;
@@ -26,16 +26,16 @@
   --color-accent-soft: #ffedd5;
   --color-accent-foreground: #9a3412;
 
-  --color-success: #10b981;
-  --color-success-soft: #d1fae5;
-  --color-success-foreground: #065f46;
+  --color-success: #16a34a;
+  --color-success-soft: #dcfce7;
+  --color-success-foreground: #166534;
 
-  --color-error: #ef4444;
+  --color-error: #dc2626;
   --color-error-soft: #fee2e2;
   --color-error-foreground: #991b1b;
 
-  --color-retail-dark: #111827;
-  --color-retail-warm: #fff7ed;
+  --color-retail-dark: #172026;
+  --color-retail-warm: #f0fdfa;
   --color-retail-promo: #f97316;
 
   --radius-sm: 0.5rem;
@@ -44,7 +44,7 @@
   --radius-xl: 1.25rem;
   --radius-2xl: 1.75rem;
 
-  --shadow-card: 0 14px 35px rgba(17, 24, 39, 0.08);
-  --shadow-card-hover: 0 24px 60px rgba(17, 24, 39, 0.14);
-  --shadow-soft: 0 24px 70px rgba(249, 115, 22, 0.14);
+  --shadow-card: 0 14px 35px rgba(15, 118, 110, 0.1);
+  --shadow-card-hover: 0 24px 60px rgba(15, 118, 110, 0.18);
+  --shadow-soft: 0 24px 70px rgba(20, 184, 166, 0.18);
 }

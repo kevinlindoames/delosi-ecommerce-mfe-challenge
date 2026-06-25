@@ -11,9 +11,9 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 32rem),
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 30rem),
-    linear-gradient(180deg, #fff7ed 0%, #f8fafc 42%, #ffffff 100%);
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.18), transparent 32rem),
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.14), transparent 30rem),
+    linear-gradient(180deg, #f8faf7 0%, #ecfdf5 42%, #ffffff 100%);
   color: var(--color-foreground);
   text-rendering: optimizeLegibility;
 }
@@ -31,6 +31,6 @@ textarea {
 }
 
 ::selection {
-  background: var(--color-accent-soft);
+  background: var(--color-primary-soft);
   color: var(--color-heading);
 }
